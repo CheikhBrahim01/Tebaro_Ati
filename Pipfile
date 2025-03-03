@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "==5.0"
+djangorestframework = "==3.14"
+beautifulsoup4 = "==4.12.2"
+requests= "==2.31.0"
+django-user-agents= "==0.4.0"
+setuptools = "*"
+django-cors-headers = "*"
+psycopg2-binary = "*"
+django-two-factor-auth = {extras = ["phonenumbers"], version = "*"}
+pyotp = "*"
+pillow = "*"
+fastapi = "*"
+fastapi-mail = "*"
+uvicorn = "*"
+web3 = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
