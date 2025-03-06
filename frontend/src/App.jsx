@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
@@ -24,7 +25,7 @@ import AdminTransactionWithdrawalPage from './pages/AdminTransactionWithdrawalPa
 function AppContent() {
   const location = useLocation();
 
-  const noNavbarPaths = ['/login', '/register', '/setup-2fa'];
+  const noNavbarPaths = ['/login', '/register', '/setup-2fa', '/forgot-password', '/reset-password'];
   const shouldShowNavbar = !noNavbarPaths.some((path) =>
     location.pathname.startsWith(path)
   );
@@ -89,6 +90,8 @@ function AppContent() {
               </AdminRoute>
             }
           />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Routes>
       </main>
     </div>

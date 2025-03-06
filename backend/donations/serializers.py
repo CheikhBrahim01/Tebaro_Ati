@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Transactions, Wallet, Project, Transaction
+from .models import Wallet, Project, Transaction
 
 class WalletSerializer(serializers.ModelSerializer):
     class Meta:
@@ -74,7 +74,7 @@ class AdminTransactionSerializer(serializers.ModelSerializer):
             'timestamp'
         ]
 
-class TransactionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Transactions
-        fields = '_all_'
+# class TransactionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Transaction
+#         fields = '__all__'

@@ -90,7 +90,7 @@ const SignupPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-cyan-300 via-sky-300 to-white">
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md mt-16 relative">
         <h2 className="text-center text-2xl font-bold text-cyan-500">
-          {step === 'signup' ? 'Sign Up' : 'Two-Factor Authentication'}
+          {step === 'signup' ? 'Inscription' : 'Two-Factor Authentication'}
         </h2>
         <div className="mt-1 mx-auto w-16 h-1 bg-cyan-500 rounded absolute left-1/2 transform -translate-x-1/2"></div>
 
@@ -115,7 +115,7 @@ const SignupPage = () => {
                 <input
                   {...registerSignup('phone_number')}
                   type="text"
-                  placeholder="Phone Number"
+                  placeholder="Numéro de téléphone"
                   className="block w-full border-0 bg-gray-200 py-2 pr-2 pl-3 
                                  text-gray-900 placeholder-gray-500 focus:bg-gray-200 
                                  focus:outline-none rounded-full"
@@ -136,7 +136,7 @@ const SignupPage = () => {
                 <input
                   {...registerSignup('full_name')}
                   type="text"
-                  placeholder="Full Name"
+                  placeholder="Nome Complete"
                   className="block w-full border-0 bg-gray-200 py-2 pr-2 pl-3 
                                  text-gray-900 placeholder-gray-500 focus:bg-gray-200 
                                  focus:outline-none rounded-full"
@@ -178,7 +178,7 @@ const SignupPage = () => {
                 <input
                   {...registerSignup('password')}
                   type="password"
-                  placeholder="Password"
+                  placeholder="Mot de passe"
                   className="block w-full border-0 bg-gray-200 py-2 pr-2 pl-3 
                                  text-gray-900 placeholder-gray-500 focus:bg-gray-200 
                                  focus:outline-none rounded-full"
@@ -199,7 +199,7 @@ const SignupPage = () => {
                 <input
                   {...registerSignup('password2')}
                   type="password"
-                  placeholder="Confirm Password"
+                  placeholder="Confirmer le mot de passe"
                   className="block w-full border-0 bg-gray-200 py-2 pr-2 pl-3 
                                  text-gray-900 placeholder-gray-500 focus:bg-gray-200 
                                  focus:outline-none rounded-full"
@@ -220,19 +220,19 @@ const SignupPage = () => {
                            rounded-full shadow-md hover:bg-cyan-400 
                            focus:ring-2 focus:ring-cyan-400"
               >
-                Sign Up
+                Inscrit
               </button>
             </div>
 
             {/* Already have an account? Go to Login */}
             <div className="text-center mt-4">
               <p>
-                Already have an account?{' '}
+                Vous avez deja un compte?{' '}
                 <span
                   onClick={() => navigate('/login')}
                   className="text-cyan-500 hover:underline cursor-pointer"
                 >
-                  Login
+                  connecter
                 </span>
               </p>
             </div>

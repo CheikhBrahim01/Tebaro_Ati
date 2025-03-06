@@ -94,3 +94,24 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.full_name} ({self.phone_number})"
     
+
+# users/models.py (ou dans un module spécifique, par exemple users/models_otp.py)
+
+from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+
+class OTP(models.Model):
+    phone_number = models.CharField(max_length=20)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_valid(self):
+        # Par exemple, OTP est valide pendant 5 minutes
+        expiration_time = self.created_at + timedelta(minutes=5)
+        return timezone.now() < expiration_time
+
+    def __str__(self):
+        return f"OTP {self.code} pour {self.phone_number}"
+
+    

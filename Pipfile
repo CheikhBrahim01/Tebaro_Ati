@@ -19,6 +19,7 @@ fastapi = "*"
 fastapi-mail = "*"
 uvicorn = "*"
 web3 = "*"
+cryptography = "*"
 
 [dev-packages]
 

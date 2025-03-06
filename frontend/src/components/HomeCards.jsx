@@ -7,7 +7,7 @@ const HomeCards = () => {
       <div className='container-xl lg:container m-auto'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg'>
           <Card>
-            <h2 className='text-2xl font-bold'>For Donor</h2>
+            <h2 className='text-2xl font-bold'>Pour Donateur</h2>
             <p className='mt-2 mb-4'>
               Browse all projects on Tebaro_ati and start helping
             </p>
@@ -19,7 +19,7 @@ const HomeCards = () => {
             </Link>
           </Card>
 
-          <Card bg='bg-cyan-100'>
+          <Card bg='bg-blue-50'>
             <h2 className='text-2xl font-bold'>For Beneficiary</h2>
             <p className='mt-2 mb-4'>
               List your project to find the perfect donor for help

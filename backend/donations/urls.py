@@ -5,7 +5,6 @@ from .views import (
     AdminTransactionListView,
     ProjectDetailView,
     TopDonatorsView,
-    TransferView,
     WalletDetailView,
     WalletTopupView,
     WalletTransactionHistoryView,
@@ -35,6 +34,6 @@ urlpatterns = [
     path('admin/transactions/', AdminTransactionListView.as_view(), name='admin-transaction-list'),
     path('admin/transactions/<int:pk>/', AdminTransactionDetailView.as_view(), name='admin-transaction-detail'),
     path('admin/transactions/topup/', AdminTransactionTopupView.as_view(), name='admin-transaction-topup'),
-    path('transfer/', TransferView.as_view(), name='transfer'),
+    
     path('admin/transactions/withdrawal/', AdminTransactionWithdrawalView.as_view(), name='admin-transaction-withdrawal'),
 ]

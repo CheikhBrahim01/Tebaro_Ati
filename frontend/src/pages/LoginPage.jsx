@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
 
+
 // Icons (from Bootstrap Icons, for example)
 // Make sure you have <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" />
 // or use your own preferred icon set.
@@ -89,7 +90,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-cyan-300 via-sky-300 to-white">
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md mt-16 relative">
         <h2 className="text-center text-2xl font-bold text-cyan-500">
-          {twoFactorRequired ? 'Two-Factor Authentication' : 'Login'}
+          {twoFactorRequired ? 'Two-Factor Authentication' : 'Se connecter'}
         </h2>
         <div className="mt-1 mx-auto w-16 h-1 bg-cyan-500 rounded absolute left-1/2 transform -translate-x-1/2"></div>
 
@@ -153,7 +154,7 @@ const LoginPage = () => {
                 <input
                   type="text"
                   {...loginForm.register('phone_number')}
-                  placeholder="Phone Number"
+                  placeholder="numéro de téléphone"
                   className="block w-full border-0 bg-gray-200 py-2 pr-2 pl-3 text-gray-900 placeholder-gray-500 focus:bg-gray-200 focus:outline-none rounded-full"
                 />
               </div>
@@ -171,7 +172,7 @@ const LoginPage = () => {
                 <input
                   type="password"
                   {...loginForm.register('password')}
-                  placeholder="Password"
+                  placeholder="mot de passe"
                   className="block w-full border-0 bg-gray-200 py-2 pr-2 pl-3 text-gray-900 placeholder-gray-500 focus:bg-gray-200 focus:outline-none rounded-full"
                 />
               </div>
@@ -188,19 +189,31 @@ const LoginPage = () => {
                 type="submit"
                 className="w-full py-2 px-4 bg-cyan-500 text-white font-semibold rounded-full shadow-md hover:bg-cyan-400 focus:ring-2 focus:ring-cyan-400"
               >
-                Login
+                CONNEXION
               </button>
             </div>
 
             {/* Optionally add "Forgot password?" or "Sign Up" links */}
             <div className="text-center mt-4">
               <p>
-                Don't have an account?{' '}
+                Nouvel utilisateur?{' '}
                 <span
                   onClick={() => navigate('/register')}
                   className="text-cyan-500 hover:underline cursor-pointer"
                 >
-                  Sign Up
+                  S'inscrire
+                </span>
+              </p>
+            </div>
+
+            <div className="text-center mt-4">
+              <p>
+                
+                <span
+                  onClick={() => navigate('/forgot-password')}
+                  className="text-cyan-500 hover:underline cursor-pointer"
+                >
+                  Mot de passe oublié?
                 </span>
               </p>
             </div>

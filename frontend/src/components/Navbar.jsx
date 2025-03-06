@@ -75,7 +75,7 @@ const Navbar = () => {
                         }}
                         className="w-full text-left block px-4 py-2 text-gray-800 hover:bg-gray-100"
                       >
-                        Logout
+                        Déconnecter
                       </button>
                     </div>
                   )}
@@ -83,7 +83,7 @@ const Navbar = () => {
               </>
             ) : (
               <Link to="/login" className="hover:text-indigo-200 transition">
-                Login
+                Se connecter
               </Link>
             )}
           </div>
@@ -134,12 +134,12 @@ const Navbar = () => {
                 onClick={() => setShowLogoutConfirm(true)}
                 className="block text-white py-2 px-4 w-full text-left hover:bg-red-500 bg-red-600"
               >
-                Logout
+                Déconnecter
               </button>
             </>
           ) : (
             <Link to="/login" className="block text-white py-2 px-4 hover:bg-cyan-500">
-              Login
+              Se connecter
             </Link>
           )}
         </div>
@@ -150,8 +150,8 @@ const Navbar = () => {
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="absolute inset-0 bg-black opacity-50"></div>
           <div className="bg-white text-black rounded-lg shadow-lg p-6 z-10 max-w-sm mx-auto text-center">
-            <h2 className="text-xl font-bold mb-4">Confirm Logout</h2>
-            <p className="mb-6">Are you sure you want to logout?</p>
+            <h2 className="text-xl font-bold mb-4">Confirmer la déconnexion</h2>
+            <p className="mb-6">Vous avez sur que vous voulez déconnecter?</p>
             <div className="flex justify-around">
               <button
                 onClick={() => setShowLogoutConfirm(false)}

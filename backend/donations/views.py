@@ -4,9 +4,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 from django.shortcuts import get_object_or_404
 
-from .blockchain import record_donation_on_chain, transfer_amount, web3
+from .blockchain import record_donation_on_chain
 
-from .models import Transactions, Wallet, Project, Transaction
+# from .blockchain import record_donation_on_chain, transfer_amount, web3
+
+from .models import  Wallet, Project, Transaction
 from .serializers import (
     TransactionSerializer,
     WalletSerializer,
@@ -15,6 +17,9 @@ from .serializers import (
     DonationSerializer,
     WithdrawalSerializer
 )
+
+
+
 
 # Vue pour récupérer les informations du portefeuille de l'utilisateur
 class WalletDetailView(APIView):
@@ -108,6 +113,59 @@ from .utils import notify_goal_reached_via_fastapi  # <-- Importez votre fonctio
 
 # from .blockchain import record_donation_on_chain
 
+# class DonationView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         serializer = DonationSerializer(data=request.data)
+#         if serializer.is_valid():
+#             project_id = serializer.validated_data['project_id']
+#             amount = serializer.validated_data['amount']
+
+#             project = get_object_or_404(Project, id=project_id)
+
+#             if project.beneficiary == request.user:
+#                 return Response({"error": "Vous ne pouvez pas donner à votre propre projet."}, status=400)
+
+#             wallet, _ = Wallet.objects.get_or_create(user=request.user)
+#             if wallet.balance < amount:
+#                 return Response({"error": "Solde insuffisant."}, status=400)
+
+#             wallet.balance -= amount
+#             project.collected_amount += amount
+#             wallet.save()
+#             project.save()
+
+#             Transaction.objects.create(
+#                 wallet=wallet,
+#                 project=project,
+#                 transaction_type='donation',
+#                 amount=amount
+#             )
+
+#             # Enregistrer le don sur la blockchain
+#             try:
+#                 txn_hash = record_donation_on_chain(request.user.phone_number, amount)
+#                 print("Transaction hash:", txn_hash)
+#             except Exception as e:
+#                 print("Erreur blockchain :", e)
+
+#             return Response({"message": "Don effectué avec succès."}, status=200)
+#         return Response(serializer.errors, status=400)
+
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from .models import Wallet, Project, Transaction
+from .serializers import DonationSerializer
+from .utils import create_transaction  # <-- Import de la fonction utilitaire
+
+from .utils import create_transaction, save_log_entry  # ou log_transaction si vous préférez écrire dans un fichier
+
+
 class DonationView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -116,39 +174,52 @@ class DonationView(APIView):
         if serializer.is_valid():
             project_id = serializer.validated_data['project_id']
             amount = serializer.validated_data['amount']
-
             project = get_object_or_404(Project, id=project_id)
+
+            if project.is_closed:
+                return Response({"message": "Ce projet est fermé aux dons."}, status=200)
+
+            if not project.can_receive_donations():
+                return Response({"message": "Ce projet a déjà atteint son objectif de financement."}, status=200)
 
             if project.beneficiary == request.user:
                 return Response({"error": "Vous ne pouvez pas donner à votre propre projet."}, status=400)
 
             wallet, _ = Wallet.objects.get_or_create(user=request.user)
             if wallet.balance < amount:
-                return Response({"error": "Solde insuffisant."}, status=400)
+                return Response({"error": "Solde insuffisant dans le portefeuille."}, status=400)
 
             wallet.balance -= amount
             project.collected_amount += amount
             wallet.save()
             project.save()
 
-            Transaction.objects.create(
-                wallet=wallet,
+            # Créer la transaction avec la chaîne de hachage
+            create_transaction(
+                wallet,
                 project=project,
                 transaction_type='donation',
                 amount=amount
             )
 
-            # Enregistrer le don sur la blockchain
-            try:
-                txn_hash = record_donation_on_chain(request.user.phone_number, amount)
-                print("Transaction hash:", txn_hash)
-            except Exception as e:
-                print("Erreur blockchain :", e)
+            # Si le projet atteint son objectif, on ferme le projet
+            if project.collected_amount >= project.target_amount:
+                project.is_closed = True
+                project.save()
+                log_message = f"Le projet '{project.title}' a atteint son objectif avec {project.collected_amount} MRU le {project.timestamp}."
+                save_log_entry(log_message)
+                return Response(
+                    {"message": "Votre don a été accepté et le projet a atteint son objectif. Il est désormais fermé aux dons."},
+                    status=200
+                )
+
+            # Enregistrer un log pour ce don
+            log_message = f"Don de {amount} MRU effectué sur le projet '{project.title}' par {request.user.full_name} le {project.created_at}."
+
+            save_log_entry(log_message)
 
             return Response({"message": "Don effectué avec succès."}, status=200)
         return Response(serializer.errors, status=400)
-
-
 
 # class DonationView(APIView):
 #     permission_classes = [IsAuthenticated]
@@ -160,60 +231,56 @@ class DonationView(APIView):
 #             amount = serializer.validated_data['amount']
 #             project = get_object_or_404(Project, id=project_id)
 
-#             # Si le projet est fermé, renvoyer un message informatif
 #             if project.is_closed:
 #                 return Response(
 #                     {"message": "Ce projet est fermé aux dons."},
-#                     status=status.HTTP_200_OK
+#                     status=200
 #                 )
 
 #             if not project.can_receive_donations():
 #                 return Response(
 #                     {"message": "Ce projet a déjà atteint son objectif de financement."},
-#                     status=status.HTTP_200_OK
+#                     status=200
 #                 )
 
 #             if project.beneficiary == request.user:
 #                 return Response(
 #                     {"error": "Vous ne pouvez pas donner à votre propre projet."},
-#                     status=status.HTTP_400_BAD_REQUEST
+#                     status=400
 #                 )
 
 #             wallet, _ = Wallet.objects.get_or_create(user=request.user)
 #             if wallet.balance < amount:
 #                 return Response(
 #                     {"error": "Solde insuffisant dans le portefeuille."},
-#                     status=status.HTTP_400_BAD_REQUEST
+#                     status=400
 #                 )
 
+#             # Mise à jour des soldes
 #             wallet.balance -= amount
 #             project.collected_amount += amount
-
 #             wallet.save()
 #             project.save()
 
-#             Transaction.objects.create(
-#                 wallet=wallet,
+#             # Créer la transaction en utilisant notre fonction utilitaire
+#             create_transaction(
+#                 wallet,
 #                 project=project,
 #                 transaction_type='donation',
 #                 amount=amount
 #             )
 
-#             # Optionnel : si après le don, le projet atteint son objectif, vous pouvez éventuellement fermer le projet automatiquement.
+#             # Optionnel : si après le don, le projet atteint son objectif, le fermer
 #             if project.collected_amount >= project.target_amount:
 #                 project.is_closed = True
 #                 project.save()
 #                 return Response(
 #                     {"message": "Votre don a été accepté et ce projet a atteint son objectif. Il est désormais fermé aux dons."},
-#                     status=status.HTTP_200_OK
+#                     status=200
 #                 )
 
-
-#             return Response({"message": "Don effectué avec succès."}, status=status.HTTP_200_OK)
-#  
-# 
-# 
-#        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#             return Response({"message": "Don effectué avec succès."}, status=200)
+#         return Response(serializer.errors, status=400)
 
 
 class BeneficiaryWithdrawalView(APIView):
@@ -605,48 +672,48 @@ class AdminTransactionWithdrawalView(generics.ListAPIView):
     
 
 
-class TransferView(APIView):
-    def post(self, request):
-        try:
-            sender = request.data.get('sender')
-            recipient = request.data.get('recipient')
-            amount = float(request.data.get('amount'))  # Convert to float for decimals
+# class TransferView(APIView):
+#     def post(self, request):
+#         try:
+#             sender = request.data.get('sender')
+#             recipient = request.data.get('recipient')
+#             amount = float(request.data.get('amount'))  # Convert to float for decimals
 
-            # Validate input
-            if not sender or not recipient or amount <= 0:
-                return Response({"error": "Invalid input parameters"}, status=400)
+#             # Validate input
+#             if not sender or not recipient or amount <= 0:
+#                 return Response({"error": "Invalid input parameters"}, status=400)
 
-            # Validate Ethereum addresses
-            if not web3.is_address(sender):
-                return Response({"error": "Invalid sender address"}, status=400)
-            if not web3.is_address(recipient):
-                return Response({"error": "Invalid recipient address"}, status=400)
+#             # Validate Ethereum addresses
+#             if not web3.is_address(sender):
+#                 return Response({"error": "Invalid sender address"}, status=400)
+#             if not web3.is_address(recipient):
+#                 return Response({"error": "Invalid recipient address"}, status=400)
 
-            # Transfer amount using Web3
-            tx_hash = transfer_amount(sender, recipient, amount)
+#             # Transfer amount using Web3
+#             tx_hash = transfer_amount(sender, recipient, amount)
             
-            print('tx_hasg'+tx_hash)
+#             print('tx_hasg'+tx_hash)
 
-            # Fetch transaction details from the blockchain using the web3 instance
-            tx_details = web3.eth.get_transaction(tx_hash)
-            tx_receipt = web3.eth.get_transaction_receipt(tx_hash)
-            block = web3.eth.get_block(tx_receipt.blockNumber)
-            timestamp = datetime.datetime.fromtimestamp(block.timestamp, tz=datetime.timezone.utc)
+#             # Fetch transaction details from the blockchain using the web3 instance
+#             tx_details = web3.eth.get_transaction(tx_hash)
+#             tx_receipt = web3.eth.get_transaction_receipt(tx_hash)
+#             block = web3.eth.get_block(tx_receipt.blockNumber)
+#             timestamp = datetime.datetime.fromtimestamp(block.timestamp, tz=datetime.timezone.utc)
 
 
-            # Create and save the transaction in the database
-            transaction = Transactions.objects.create(
-                sender=sender,
-                recipient=recipient,
-                amount=amount,
-                tx_hash=tx_hash,
-                block_number=tx_receipt.blockNumber,
-                timestamp=timestamp
-            )
+#             # Create and save the transaction in the database
+#             transaction = Transactions.objects.create(
+#                 sender=sender,
+#                 recipient=recipient,
+#                 amount=amount,
+#                 tx_hash=tx_hash,
+#                 block_number=tx_receipt.blockNumber,
+#                 timestamp=timestamp
+#             )
 
-            # Serialize and return the transaction
-            serializer = TransactionSerializer(transaction)
-            return Response({"transaction": serializer.data}, status=200)
+#             # Serialize and return the transaction
+#             serializer = TransactionSerializer(transaction)
+#             return Response({"transaction": serializer.data}, status=200)
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=500)
